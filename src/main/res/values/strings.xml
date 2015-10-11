@@ -12,4 +12,6 @@
     <string name="memo_solved_label">Solved?</string>
     <string name="memos_title">Memos</string>
     <string name="title_activity_memo_list">MemoListActivity</string>
+    <string name="title_activity_memo_pager">MemoPagerActivity</string>
+    <string name="date_picker_title">Date of memo</string>
 </resources>

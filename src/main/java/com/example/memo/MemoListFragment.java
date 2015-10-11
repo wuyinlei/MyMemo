@@ -60,7 +60,8 @@ public class MemoListFragment extends ListFragment {
         Memo m = ((MemoAdapter) getListAdapter()).getItem(position);
 //        Log.d(TAG, m.getTitle() + "被点击了");
         //启动MemoActivity活动，并且传递信息来确定打开的是哪一个
-        Intent i = new Intent(getActivity(), MemoActivity.class);
+        //Intent i = new Intent(getActivity(), MemoActivity.class);
+        Intent i = new Intent(getActivity(),MemoPagerActivity.class);
         i.putExtra(MemoFragment.EXTRA_MEMO_ID, m.getId());
         startActivity(i);
     }
