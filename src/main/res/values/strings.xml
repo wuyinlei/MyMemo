@@ -10,4 +10,6 @@
     <string name="memo_title_label">Title</string>
     <string name="memo_details_label">Details</string>
     <string name="memo_solved_label">Solved?</string>
+    <string name="memos_title">Memos</string>
+    <string name="title_activity_memo_list">MemoListActivity</string>
 </resources>

@@ -10,9 +10,13 @@
         <activity
             android:name=".MemoActivity"
             android:label="@string/app_name" >
+
+        </activity>
+        <activity
+            android:name=".MemoListActivity"
+            android:label="@string/title_activity_memo_list" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
