@@ -12,6 +12,8 @@ import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,7 +48,15 @@ public class MemoFragment extends Fragment {
         //UUID memoId = (UUID) getActivity().getIntent().getSerializableExtra(EXTRA_MEMO_ID);
         UUID memoId = (UUID) getArguments().getSerializable(EXTRA_MEMO_ID);
         mMemo = MemoLab.get(getActivity()).getMemo(memoId);
+
+
     }
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.delete_menu,menu);
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -134,6 +144,9 @@ public class MemoFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            //实现在MemoFragment中删除数据
+            case R.id.menu_delete_memo:
+                MemoLab.get(getActivity()).deleteMemo(mMemo);
             case android.R.id.home:
                 //响应home键，如果能够找到他的父类或者他的父类不为空的时候，就返回到他的父类
                 if (NavUtils.getParentActivityName(getActivity()) != null) {

@@ -5,13 +5,16 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.view.ContextThemeWrapper;
+import android.view.ActionMode;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -56,6 +59,55 @@ public class MemoListFragment extends ListFragment {
         View v = inflater.inflate(R.layout.fragment_list_memo_empty, container, false);
         mListView = (ListView) v.findViewById(android.R.id.list);
         mListView.setEmptyView(v.findViewById(android.R.id.empty));
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+            registerForContextMenu(mListView);
+        } else {
+            mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+            //为列表视图中的操作模式回调方法
+            mListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+                @Override
+                public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+
+                }
+
+                @Override
+                public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                    MenuInflater inflater = mode.getMenuInflater();
+                    inflater.inflate(R.menu.memo_list_item_context, menu);
+                    return true;
+                }
+
+                @Override
+                public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                    return true;
+                }
+
+                @Override
+                public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.menu_item_delete_memo:
+                            MemoAdapter adapter = (MemoAdapter) getListAdapter();
+                            MemoLab memoLab = MemoLab.get(getActivity());
+                            for (int i = adapter.getCount() - 1; i >= 0; i--) {
+                                if (getListView().isItemChecked(i)) {
+                                    memoLab.deleteMemo(adapter.getItem(i));
+                                }
+                            }
+                            mode.finish();
+                            //刷新列表项
+                            adapter.notifyDataSetChanged();
+                            return true;
+                        default:
+                            return false;
+                    }
+                }
+
+                @Override
+                public void onDestroyActionMode(ActionMode mode) {
+
+                }
+            });
+        }
 
         newMemoButton = (Button) v.findViewById(R.id.newMemoButton);
         newMemoButton.setOnClickListener(new View.OnClickListener() {
@@ -63,9 +115,9 @@ public class MemoListFragment extends ListFragment {
             public void onClick(View v) {
                 Memo memo = new Memo();
                 MemoLab.get(getActivity()).addMemo(memo);
-                Intent i = new Intent(getActivity(),MemoPagerActivity.class);
-                i.putExtra(MemoFragment.EXTRA_MEMO_ID,memo.getId());
-                startActivityForResult(i,0);
+                Intent i = new Intent(getActivity(), MemoPagerActivity.class);
+                i.putExtra(MemoFragment.EXTRA_MEMO_ID, memo.getId());
+                startActivityForResult(i, 0);
             }
         });
 
@@ -128,7 +180,10 @@ public class MemoListFragment extends ListFragment {
         ((MemoAdapter) getListAdapter()).notifyDataSetChanged();
     }
 
-    //实例化生成选项菜单
+
+    /**
+     * 实例化生成选项菜单,这个菜单就是你在点击手机menu键时会看到的菜单
+     */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -140,6 +195,9 @@ public class MemoListFragment extends ListFragment {
         }
     }
 
+    /**
+     * 这个方法只在onCreateOptionsMenu 创建的菜单被选中时才会被触发
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -166,5 +224,34 @@ public class MemoListFragment extends ListFragment {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    /**
+     * 创建上下文菜单你还需要对此菜单进行注册Activity.registerForContextMenu(View view),
+     * 这个菜单是在你长按前面注册的view时看到的菜单。
+     */
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        getActivity().getMenuInflater().inflate(R.menu.memo_list_item_context, menu);
+    }
+
+    /**
+     * 监听上下文菜单选项选择事件
+     * 这个方法只在onCreateContextMenu 创建的菜单被选中时才会被触发
+     */
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        int positon = info.position;
+        MemoAdapter adapter = (MemoAdapter) getListAdapter();
+        Memo memo = adapter.getItem(positon);
+        switch (item.getItemId()) {
+            case R.id.menu_item_delete_memo:
+                MemoLab.get(getActivity()).deleteMemo(memo);
+                adapter.notifyDataSetChanged();
+                ;
+                return true;
+        }
+        return super.onContextItemSelected(item);
     }
 }

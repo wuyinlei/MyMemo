@@ -49,8 +49,15 @@ public class MemoLab {
         return mMemos;
     }
 
+
+    //添加的方法
     public void addMemo(Memo m) {
         mMemos.add(m);
+    }
+
+    //删除的方法
+    public void deleteMemo(Memo m){
+        mMemos.remove(m);
     }
 
     public Memo getMemo(UUID id) {
