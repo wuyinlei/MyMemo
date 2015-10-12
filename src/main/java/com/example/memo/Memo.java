@@ -1,5 +1,8 @@
 package com.example.memo;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Date;
 import java.util.UUID;
 
@@ -7,6 +10,12 @@ import java.util.UUID;
  * Created by ruolan on 2015/10/11.
  */
 public class Memo {
+
+    //添加用于保存的静态常量
+    private static final String JSON_ID = "id";
+    private static final String JSON_TITLE = "title";
+    private static final String JSON_SOLVED = "solved";
+    private static final String JSON_DATE = "date";
 
     private UUID mId;
     private String mTitle;
@@ -50,5 +59,24 @@ public class Memo {
     @Override
     public String toString() {
         return mTitle;
+    }
+
+    public Memo(JSONObject json)throws JSONException{
+        mId = UUID.fromString(json.getString(JSON_ID));
+        if (json.has(JSON_TITLE)){
+            mTitle = json.getString(JSON_TITLE);
+        }
+        mSolved = json.getBoolean(JSON_SOLVED);
+        mDate = new Date(json.getLong(JSON_DATE));
+    }
+
+    //实现toJSON()方法
+    public JSONObject toJSON()throws JSONException{
+        JSONObject json = new JSONObject();
+        json.put(JSON_ID,mId.toString());
+        json.put(JSON_TITLE,mTitle);
+        json.put(JSON_SOLVED,mSolved);
+        json.put(JSON_DATE,mDate.getTime());
+        return json;
     }
 }

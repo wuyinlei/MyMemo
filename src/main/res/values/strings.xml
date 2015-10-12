@@ -14,4 +14,10 @@
     <string name="title_activity_memo_list">MemoListActivity</string>
     <string name="title_activity_memo_pager">MemoPagerActivity</string>
     <string name="date_picker_title">Date of memo</string>
+    <string name="new_memo">New Memo</string>
+    <string name="show_subtitle">Show Subtitle</string>
+    <string name="hide_subtitle">Hide Subtitle</string>
+    <string name="subtitle">如果你看见了，就说些什么吧！</string>
+    <string name="delete_memo">Delete</string>
+    <string name="empty1">没有要显示的资源</string>
 </resources>

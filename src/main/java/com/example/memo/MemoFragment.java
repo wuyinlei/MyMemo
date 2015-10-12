@@ -4,12 +4,15 @@ package com.example.memo;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -39,6 +42,7 @@ public class MemoFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         //UUID memoId = (UUID) getActivity().getIntent().getSerializableExtra(EXTRA_MEMO_ID);
         UUID memoId = (UUID) getArguments().getSerializable(EXTRA_MEMO_ID);
         mMemo = MemoLab.get(getActivity()).getMemo(memoId);
@@ -47,6 +51,15 @@ public class MemoFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_memo, container, false);
+
+        //启动向上导航按钮
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            if (NavUtils.getParentActivityName(getActivity()) != null) {
+                getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+            }
+        }
+
+
         mTitleField = (EditText) view.findViewById(R.id.memo_title);
         mTitleField.setText(mMemo.getTitle());
         mTitleField.addTextChangedListener(new TextWatcher() {
@@ -78,7 +91,7 @@ public class MemoFragment extends Fragment {
                 //添加newInstance()方法
                 DatePickerFragment dialog
                         = DatePickerFragment.newInstance(mMemo.getDate());
-                dialog.setTargetFragment(MemoFragment.this,REQUEST_DATE);
+                dialog.setTargetFragment(MemoFragment.this, REQUEST_DATE);
                 dialog.show(fm, DIALOG_DATE);
             }
         });
@@ -107,11 +120,37 @@ public class MemoFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != Activity.RESULT_OK) return;
-        if (requestCode == REQUEST_DATE){
+        if (requestCode == REQUEST_DATE) {
             Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
             mMemo.setDate(date);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss EEE");
             mDateButton.setText(sdf.format(mMemo.getDate()));
         }
+    }
+
+    /**
+     * 响应应用图标（Home图标)菜单项
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                //响应home键，如果能够找到他的父类或者他的父类不为空的时候，就返回到他的父类
+                if (NavUtils.getParentActivityName(getActivity()) != null) {
+                    NavUtils.navigateUpFromSameTask(getActivity());
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /**
+     * 在onPause（）方法中保存数据
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        MemoLab.get(getActivity()).saveMemos();
     }
 }
